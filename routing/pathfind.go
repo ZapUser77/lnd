@@ -516,7 +516,6 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 	// If we're sending to self, we need to add additional edges that will point to self
 	// with a starting distance of infinity. First we create a virtual self, vSelf, node.
 	if sourceNode.PubKeyBytes == targetNode.PubKeyBytes{
-		fmt.Println("Source is destination")
 		vSelfPubKeyHex := "03dd46ff29a6941b4a2607525b043ec9b020b3f318a1bf281536fd7011ec59c882"
 		vSelfPubKeyBytes, err := hex.DecodeString(vSelfPubKeyHex)
 		vSelfPubKey, err := btcec.ParsePubKey(vSelfPubKeyBytes, btcec.S256())
@@ -640,21 +639,8 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 				}
 			}
 		}
-/*		if pivot != Vertex (sourceNode.PubKeyBytes){
-			if edge.Node.Alias == "vSelf"{
-				fmt.Println(tempDist)
-				fmt.Println(distance[v].dist)
-				fmt.Println(bandwidth)
-				fmt.Println(amt)
-				fmt.Println(edge.MinHTLC)
-				fmt.Println(edge.TimeLockDelta)
-				fmt.Println(edge.Node.Alias)
-				fmt.Println(prev[pivot].prevNode)
-				fmt.Println(v)
-				fmt.Println(edge.ChannelID)
-			}
-		}
-*/		// If this new tentative distance is better than the current
+
+		// If this new tentative distance is better than the current
 		// best known distance to this node, then we record the new
 		// better distance, and also populate our "next hop" map with
 		// this edge. We'll also shave off irrelevant edges by adding
@@ -711,9 +697,7 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 		// from the heap.
 		partialPath := heap.Pop(&nodeHeap).(nodeWithDist)
 		bestNode := partialPath.node
-		if targetNode.Alias == "vSelf" {
-			fmt.Println(bestNode.Alias)
-		}
+
 		// If we've reached our target (or we don't have any outgoing
 		// edges), then we're done here and can exit the graph
 		// traversal early.
@@ -728,7 +712,6 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 		// Now that we've found the next potential step to take we'll
 		// examine all the outgoing edge (channels) from this node to
 		// further our graph traversal.
-		//		pivot := Vertex(bestNode.PubKeyBytes)
 		err := bestNode.ForEachChannel(tx, func(tx *bolt.Tx,
 			edgeInfo *channeldb.ChannelEdgeInfo,
 			outEdge, _ *channeldb.ChannelEdgePolicy) error {
