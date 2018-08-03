@@ -661,6 +661,7 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 				},
 				prevNode: pivot,
 			}
+
 			// Add this new node to our heap as we'd like to further
 			// explore down this edge.
 			heap.Push(&nodeHeap, distance[v])
@@ -704,14 +705,11 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 		if bytes.Equal(bestNode.PubKeyBytes[:], targetVertex[:]) {
 			break
 		}
-
-		pivot := Vertex(bestNode.PubKeyBytes)
-		for _, edge := range additionalEdges[bestNode.PubKeyBytes] {
-			processEdge(edge, amt, pivot)
-		}
+		
 		// Now that we've found the next potential step to take we'll
 		// examine all the outgoing edge (channels) from this node to
 		// further our graph traversal.
+		pivot := Vertex(bestNode.PubKeyBytes)
 		err := bestNode.ForEachChannel(tx, func(tx *bolt.Tx,
 			edgeInfo *channeldb.ChannelEdgeInfo,
 			outEdge, _ *channeldb.ChannelEdgePolicy) error {
@@ -730,8 +728,7 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 			}
 
 			processEdge(outEdge, edgeBandwidth, pivot)
-
-
+			
 			// TODO(roasbeef): return min HTLC as error in end?
 
 			return nil
@@ -745,10 +742,10 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 		// of the private channel, we'll assume it was selected as a
 		// routing hint due to having enough capacity for the payment
 		// and use the payment amount as its capacity.
-/*		for _, edge := range additionalEdges[bestNode.PubKeyBytes] {
+		for _, edge := range additionalEdges[bestNode.PubKeyBytes] {
 			processEdge(edge, amt, pivot)
 		}
-*/	}
+	}
 
 	// If the target node isn't found in the prev hop map, then a path
 	// doesn't exist, so we terminate in an error.
