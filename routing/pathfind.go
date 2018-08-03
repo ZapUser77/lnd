@@ -665,7 +665,7 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 			// explore down this edge.
 			heap.Push(&nodeHeap, distance[v])
 
-		// In the event of self routing altered the distance, but failed to be a vialbe path,
+		// In the event of self routing altered the distance, but failed to be a viable path,
 		// we set it back to what it was.
 		} else if targetNode.Alias == "vSelf" && storageDist !=0 {
 			distance[v] = nodeWithDist{
