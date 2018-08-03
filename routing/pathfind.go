@@ -533,7 +533,6 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 			// If the remote balance is > amount add to vSelf edge to additional
 			// edges, else ignore.  The edge policy must be from the point of view
 			// of the non-self nodes.
-			//			edgeBandwidth, _ := bandwidthHints[edgeInfo.ChannelID]
 
 			if lnwire.NewMSatFromSatoshis(edgeInfo.Capacity) - bandwidthHints[edgeInfo.ChannelID] > amt{
 				tovSelfEdge := &channeldb.ChannelEdgePolicy{
@@ -728,7 +727,7 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 			}
 
 			processEdge(outEdge, edgeBandwidth, pivot)
-			
+
 			// TODO(roasbeef): return min HTLC as error in end?
 
 			return nil
