@@ -705,7 +705,7 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 		if bytes.Equal(bestNode.PubKeyBytes[:], targetVertex[:]) {
 			break
 		}
-		
+
 		// Now that we've found the next potential step to take we'll
 		// examine all the outgoing edge (channels) from this node to
 		// further our graph traversal.
