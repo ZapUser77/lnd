@@ -6,14 +6,14 @@ import (
 	"math"
 
 	"container/heap"
-
+	
+	"github.com/btcsuite/btcd/btcec"
+	"github.com/btcsuite/btcd/chaincfg/chainhash"
+	"github.com/btcsuite/btcutil"
 	"github.com/coreos/bbolt"
 	"github.com/lightningnetwork/lightning-onion"
 	"github.com/lightningnetwork/lnd/channeldb"
 	"github.com/lightningnetwork/lnd/lnwire"
-	"github.com/btcsuite/btcd/btcec"
-	"github.com/btcsuite/btcd/chaincfg/chainhash"
-	"github.com/btcsuite/btcutil"
 )
 
 const (
@@ -357,7 +357,7 @@ func newRoute(amtToSend, feeLimit lnwire.MilliSatoshi, sourceVertex Vertex,
 		// enough capacity to carry the required amount which
 		// includes the fee dictated at each hop. Make the comparison
 		// in msat to prevent rounding errors.
-		if currentHop.AmtToForward + fee > lnwire.NewMSatFromSatoshis(
+		if currentHop.AmtToForward+fee > lnwire.NewMSatFromSatoshis(
 			currentHop.Channel.Capacity) {
 
 			err := fmt.Sprintf("channel graph has insufficient "+
@@ -501,16 +501,6 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 		return nil, err
 	}
 
-	// We can't always assume that the end destination is publicly
-	// advertised to the network and included in the graph.ForEachNode call
-	// above, so we'll manually include the target node.
-	targetVertex := NewVertex(target)
-	targetNode := &channeldb.LightningNode{PubKeyBytes: targetVertex}
-	distance[targetVertex] = nodeWithDist{
-		dist: infinity,
-		node: targetNode,
-	}
-
 	// We'll also include all the nodes found within the additional edges
 	// that are not known to us yet in the distance map.
 	for vertex := range additionalEdges {
@@ -519,6 +509,16 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 			dist: infinity,
 			node: node,
 		}
+	}
+	
+	// We can't always assume that the end destination is publicly
+	// advertised to the network and included in the graph.ForEachNode call
+	// above, so we'll manually include the target node.
+	targetVertex := NewVertex(target)
+	targetNode := &channeldb.LightningNode{PubKeyBytes: targetVertex}
+	distance[targetVertex] = nodeWithDist{
+		dist: infinity,
+		node: targetNode,
 	}
 
 	// We'll use this map as a series of "previous" hop pointers. So to get
