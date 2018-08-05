@@ -6,7 +6,7 @@ import (
 	"math"
 
 	"container/heap"
-	
+
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcutil"
@@ -500,7 +500,7 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 	}); err != nil {
 		return nil, err
 	}
-
+	
 	// We'll also include all the nodes found within the additional edges
 	// that are not known to us yet in the distance map.
 	for vertex := range additionalEdges {
@@ -510,7 +510,7 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 			node: node,
 		}
 	}
-	
+
 	// We can't always assume that the end destination is publicly
 	// advertised to the network and included in the graph.ForEachNode call
 	// above, so we'll manually include the target node.
