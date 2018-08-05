@@ -16,12 +16,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lightningnetwork/lnd/channeldb"
-	"github.com/lightningnetwork/lnd/lnwire"
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil"
+	"github.com/lightningnetwork/lnd/channeldb"
+	"github.com/lightningnetwork/lnd/lnwire"
 
 	prand "math/rand"
 )
@@ -769,7 +769,6 @@ func TestBasicGraphPathFinding(t *testing.T) {
 		t.Fatalf("incorrect total amount, expected %v got %v",
 			paymentAmt, route.TotalAmount)
 	}
-
 	// Next, we attempt to find a path from the source back to itself.
 	// Useful for load balancing channels.  Requires BandWidthHints!
 	// For efficeincy, paths with known insuffienent remote balance
@@ -781,7 +780,6 @@ func TestBasicGraphPathFinding(t *testing.T) {
 	bandwidthHints[999991] = 500000
 	bandwidthHints[2340213491] = 500000
 	bandwidthHints[689530843] =500000
-
 	path, err = findPath(
 		nil, graph, nil, sourceNode, target, ignoredVertexes,
 		ignoredEdges, paymentAmt, bandwidthHints,
@@ -789,7 +787,6 @@ func TestBasicGraphPathFinding(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to find route: %v", err)
 	}
-
 	route, err = newRoute(
 		paymentAmt, noFeeLimit, sourceVertex, path, startingHeight,
 		finalHopCLTV,
@@ -797,7 +794,6 @@ func TestBasicGraphPathFinding(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to create path: %v", err)
 	}
-
 	// The cheapest path should be lou->sat->roas 3 hops Lou-self has lower channel
 	// ID than Sat-self, and will be explored first.  However, if the pathfinding algo
 	// changes from Source -> Dest to Dest-> source (PR1321), the path may become sat-Lou-Roas,
@@ -806,7 +802,6 @@ func TestBasicGraphPathFinding(t *testing.T) {
 		t.Fatalf("shortest path not selected, should be of length 3, "+
 			"is instead: %v", len(route.Hops))
 	}
-
 	// Time to make sure paths with known insufficent incoming balance are ignored
 	// when sending to self. This sets Source->Satoshi channel as if 100% of the balance
 	// is on the source side.
@@ -818,7 +813,6 @@ func TestBasicGraphPathFinding(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to find route: %v", err)
 	}
-
 	route, err = newRoute(
 		paymentAmt, noFeeLimit, sourceVertex, path, startingHeight,
 		finalHopCLTV,
@@ -826,7 +820,6 @@ func TestBasicGraphPathFinding(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to create path: %v", err)
 	}
-
 	// The cheapest path should be sat->lou->roas 3 hops.  All the capacity of Sat is on near side,
 	// so can't have any incoming.
 	if len(route.Hops) != 3 {
@@ -850,7 +843,6 @@ func TestBasicGraphPathFinding(t *testing.T) {
 		t.Fatalf("incorrect prev chan: expected %v, got %v",
 			satNextChan.ChannelID, route.Hops[1].Channel.ChannelID)
 	}
-
 	// Lou should have a next hop and previous hop
 	louPrevChan, ok := route.prevHopChannel(aliases["luoji"])
 	if !ok {
@@ -879,7 +871,6 @@ func TestBasicGraphPathFinding(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to find route: %v", err)
 	}
-
 	route, err = newRoute(
 		paymentAmt, noFeeLimit, sourceVertex, path, startingHeight,
 		finalHopCLTV,
@@ -887,7 +878,6 @@ func TestBasicGraphPathFinding(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to create path: %v", err)
 	}
-
 	// The only path availabe is pham->soph->goku-Roasbeef
 	if len(route.Hops) != 4 {
 		t.Fatalf("shortest path not selected, should be of length r, "+
@@ -910,7 +900,6 @@ func TestBasicGraphPathFinding(t *testing.T) {
 		t.Fatalf("incorrect prev chan: expected %v, got %v",
 			phamNextChan.ChannelID, route.Hops[1].Channel.ChannelID)
 	}
-
 	// Sophon should have a next hop and previous hop
 	sophPrevChan, ok := route.prevHopChannel(aliases["sophon"])
 	if !ok {
@@ -928,7 +917,6 @@ func TestBasicGraphPathFinding(t *testing.T) {
 		t.Fatalf("incorrect prev chan: expected %v, got %v",
 			sophNextChan.ChannelID, route.Hops[2].Channel.ChannelID)
 	}
-
 	// Songoku should have a next and previous hop
 	songPrevChan, ok := route.prevHopChannel(aliases["songoku"])
 	if !ok {
@@ -1078,14 +1066,14 @@ func TestNewRoute(t *testing.T) {
 	createHop := func(baseFee lnwire.MilliSatoshi,
 		feeRate lnwire.MilliSatoshi,
 		capacity btcutil.Amount,
-		timeLockDelta uint16) (*ChannelHop) {
+		timeLockDelta uint16) *ChannelHop {
 
-		return &ChannelHop {
-			ChannelEdgePolicy: &channeldb.ChannelEdgePolicy {
+		return &ChannelHop{
+			ChannelEdgePolicy: &channeldb.ChannelEdgePolicy{
 				Node: &channeldb.LightningNode{},
 				FeeProportionalMillionths: feeRate,
-				FeeBaseMSat: baseFee,
-				TimeLockDelta: timeLockDelta,
+				FeeBaseMSat:               baseFee,
+				TimeLockDelta:             timeLockDelta,
 			},
 			Capacity: capacity,
 		}
@@ -1093,30 +1081,30 @@ func TestNewRoute(t *testing.T) {
 
 	testCases := []struct {
 		// name identifies the test case in the test output.
-		name 		      string
+		name string
 
 		// hops is the list of hops (the route) that gets passed into
 		// the call to newRoute.
-		hops 	    	      []*ChannelHop
+		hops []*ChannelHop
 
 		// paymentAmount is the amount that is send into the route
 		// indicated by hops.
-		paymentAmount 	      lnwire.MilliSatoshi
+		paymentAmount lnwire.MilliSatoshi
 
 		// expectedFees is a list of fees that every hop is expected
 		// to charge for forwarding.
-		expectedFees	      []lnwire.MilliSatoshi
+		expectedFees []lnwire.MilliSatoshi
 
 		// expectedTimeLocks is a list of time lock values that every
 		// hop is expected to specify in its outgoing HTLC. The time
 		// lock values in this list are relative to the current block
 		// height.
-		expectedTimeLocks     []uint32
+		expectedTimeLocks []uint32
 
 		// expectedTotalAmount is the total amount that is expected to
 		// be returned from newRoute. This amount should include all
 		// the fees to be paid to intermediate hops.
-		expectedTotalAmount   lnwire.MilliSatoshi
+		expectedTotalAmount lnwire.MilliSatoshi
 
 		// expectedTotalTimeLock is the time lock that is expected to
 		// be returned from newRoute. This is the time lock that should
@@ -1126,46 +1114,46 @@ func TestNewRoute(t *testing.T) {
 
 		// expectError indicates whether the newRoute call is expected
 		// to fail or succeed.
-		expectError	      bool
+		expectError bool
 
 		// expectedErrorCode indicates the expected error code when
 		// expectError is true.
-		expectedErrorCode     errorCode
-	} {
+		expectedErrorCode errorCode
+	}{
 		{
 			// For a single hop payment, no fees are expected to be paid.
-			name: "single hop",
+			name:          "single hop",
 			paymentAmount: 100000,
-			hops: []*ChannelHop {
+			hops: []*ChannelHop{
 				createHop(100, 1000, 1000, 10),
 			},
-			expectedFees: []lnwire.MilliSatoshi {0},
-			expectedTimeLocks: []uint32 {1},
-			expectedTotalAmount: 100000,
+			expectedFees:          []lnwire.MilliSatoshi{0},
+			expectedTimeLocks:     []uint32{1},
+			expectedTotalAmount:   100000,
 			expectedTotalTimeLock: 1,
 		}, {
 			// For a two hop payment, only the fee for the first hop
 			// needs to be paid. The destination hop does not require
 			// a fee to receive the payment.
-			name: "two hop",
+			name:          "two hop",
 			paymentAmount: 100000,
-			hops: []*ChannelHop {
+			hops: []*ChannelHop{
 				createHop(0, 1000, 1000, 10),
 				createHop(30, 1000, 1000, 5),
 			},
-			expectedFees: []lnwire.MilliSatoshi {130, 0},
-			expectedTimeLocks: []uint32 {1, 1},
-			expectedTotalAmount: 100130,
+			expectedFees:          []lnwire.MilliSatoshi{130, 0},
+			expectedTimeLocks:     []uint32{1, 1},
+			expectedTotalAmount:   100130,
 			expectedTotalTimeLock: 6,
 		}, {
 			// Insufficient capacity in first channel when fees are added.
-			name: "two hop insufficient",
+			name:          "two hop insufficient",
 			paymentAmount: 100000,
-			hops: []*ChannelHop {
+			hops: []*ChannelHop{
 				createHop(0, 1000, 100, 10),
 				createHop(0, 1000, 1000, 5),
 			},
-			expectError: true,
+			expectError:       true,
 			expectedErrorCode: ErrInsufficientCapacity,
 		}, {
 			// A three hop payment where the first and second hop
@@ -1173,39 +1161,39 @@ func TestNewRoute(t *testing.T) {
 			// is actually slightly higher than 1, because the amount
 			// to forward also includes the fee for the second hop. This
 			// gets rounded down to 1.
-			name: "three hop",
+			name:          "three hop",
 			paymentAmount: 100000,
-			hops: []*ChannelHop {
+			hops: []*ChannelHop{
 				createHop(0, 10, 1000, 10),
 				createHop(0, 10, 1000, 5),
 				createHop(0, 10, 1000, 3),
 			},
-			expectedFees: []lnwire.MilliSatoshi {1, 1, 0},
-			expectedTotalAmount: 100002,
-			expectedTimeLocks: []uint32 {4, 1, 1},
+			expectedFees:          []lnwire.MilliSatoshi{1, 1, 0},
+			expectedTotalAmount:   100002,
+			expectedTimeLocks:     []uint32{4, 1, 1},
 			expectedTotalTimeLock: 9,
 		}, {
 			// A three hop payment where the fee of the first hop
 			// is slightly higher (11) than the fee at the second hop,
 			// because of the increase amount to forward.
-			name: "three hop with fee carry over",
+			name:          "three hop with fee carry over",
 			paymentAmount: 100000,
-			hops: []*ChannelHop {
+			hops: []*ChannelHop{
 				createHop(0, 10000, 1000, 10),
 				createHop(0, 10000, 1000, 5),
 				createHop(0, 10000, 1000, 3),
 			},
-			expectedFees: []lnwire.MilliSatoshi {1010, 1000, 0},
-			expectedTotalAmount: 102010,
-			expectedTimeLocks: []uint32 {4, 1, 1},
+			expectedFees:          []lnwire.MilliSatoshi{1010, 1000, 0},
+			expectedTotalAmount:   102010,
+			expectedTimeLocks:     []uint32{4, 1, 1},
 			expectedTotalTimeLock: 9,
 		}, {
 			// A three hop payment where the fee policies of the first and
 			// second hop are just high enough to show the fee carry over
 			// effect.
-			name: "three hop with minimal fees for carry over",
+			name:          "three hop with minimal fees for carry over",
 			paymentAmount: 100000,
-			hops: []*ChannelHop {
+			hops: []*ChannelHop{
 				createHop(0, 10000, 1000, 10),
 
 				// First hop charges 0.1% so the second hop fee
@@ -1216,17 +1204,16 @@ func TestNewRoute(t *testing.T) {
 				// Second hop charges a fixed 1000 msat.
 				createHop(1000, 0, 1000, 3),
 			},
-			expectedFees: []lnwire.MilliSatoshi {101, 1000, 0},
-			expectedTotalAmount: 101101,
-			expectedTimeLocks: []uint32 {4, 1, 1},
+			expectedFees:          []lnwire.MilliSatoshi{101, 1000, 0},
+			expectedTotalAmount:   101101,
+			expectedTimeLocks:     []uint32{4, 1, 1},
 			expectedTotalTimeLock: 9,
-		},
-	}
+		}}
 
 	for _, testCase := range testCases {
 		assertRoute := func(t *testing.T, route *Route) {
 			if route.TotalAmount != testCase.expectedTotalAmount {
-				t.Errorf("Expected total amount is be %v" +
+				t.Errorf("Expected total amount is be %v"+
 					", but got %v instead",
 					testCase.expectedTotalAmount,
 					route.TotalAmount)
@@ -1236,7 +1223,7 @@ func TestNewRoute(t *testing.T) {
 				if testCase.expectedFees[i] !=
 					route.Hops[i].Fee {
 
-					t.Errorf("Expected fee for hop %v to " +
+					t.Errorf("Expected fee for hop %v to "+
 						"be %v, but got %v instead",
 						i, testCase.expectedFees[i],
 						route.Hops[i].Fee)
@@ -1248,7 +1235,7 @@ func TestNewRoute(t *testing.T) {
 
 			if route.TotalTimeLock != expectedTimeLockHeight {
 
-				t.Errorf("Expected total time lock to be %v" +
+				t.Errorf("Expected total time lock to be %v"+
 					", but got %v instead",
 					expectedTimeLockHeight,
 					route.TotalTimeLock)
@@ -1261,7 +1248,7 @@ func TestNewRoute(t *testing.T) {
 				if expectedTimeLockHeight !=
 					route.Hops[i].OutgoingTimeLock {
 
-					t.Errorf("Expected time lock for hop " +
+					t.Errorf("Expected time lock for hop "+
 						"%v to be %v, but got %v instead",
 						i, expectedTimeLockHeight,
 						route.Hops[i].OutgoingTimeLock)
@@ -1278,8 +1265,8 @@ func TestNewRoute(t *testing.T) {
 			if testCase.expectError {
 				expectedCode := testCase.expectedErrorCode
 				if err == nil || !IsError(err, expectedCode) {
-					t.Errorf("expected newRoute to fail " +
-						"with error code %v, but got" +
+					t.Errorf("expected newRoute to fail "+
+						"with error code %v, but got"+
 						"%v instead",
 						expectedCode, err)
 				}
