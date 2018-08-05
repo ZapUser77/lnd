@@ -500,7 +500,7 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 	}); err != nil {
 		return nil, err
 	}
-	
+
 	// We'll also include all the nodes found within the additional edges
 	// that are not known to us yet in the distance map.
 	for vertex := range additionalEdges {
