@@ -554,8 +554,6 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 		var tempDist int64
 		if distance[pivot].dist == infinity {
 			tempDist = 1
-			//		}else if distance[pivot].dist == 0 {
-			//			tempDist = 1
 		} else {
 			tempDist = distance[pivot].dist + edgeWeight(amt, edge)
 		}
