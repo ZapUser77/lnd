@@ -554,6 +554,7 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 		var tempDist int64
 		if distance[pivot].dist == infinity {
 			tempDist = 1
+
 //		}else if distance[pivot].dist == 0 {
 //			tempDist = 1
 		}else {
@@ -589,7 +590,6 @@ func findPath(tx *bolt.Tx, graph *channeldb.ChannelGraph,
 		// In the event of self routing and next node.dist is less than
 		// current node dist, then we know there is a potential path back to source.
 		} else if targetNode.PubKeyBytes == sourceNode.PubKeyBytes &&  tempDist > distance[v].dist {
-
 			// First we adds nodes and edges in the current to pass to the 'from middle to source'
 			// pathFind iteration as "ignored" to prevent loops.
 			tempIgnoredEdges := make(map[uint64]struct{})
