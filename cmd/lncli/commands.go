@@ -2041,7 +2041,6 @@ func reBalance(ctx *cli.Context) error {
 	}
 	if amt <= 0 {
 		return fmt.Errorf("amount may not be negative nor zero")
-
 	}
 
 	feeLimit, err := retrieveFeeLimit(ctx)
