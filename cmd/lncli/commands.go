@@ -2041,6 +2041,7 @@ func reBalance(ctx *cli.Context) error {
 	}
 	if amt <= 0 {
 		return fmt.Errorf("amount may not be negative nor zero")
+
 	}
 
 	feeLimit, err := retrieveFeeLimit(ctx)
@@ -2080,8 +2081,6 @@ func reBalance(ctx *cli.Context) error {
 		PubKey:         selfNode.IdentityPubkey,
 		Amt:            amt,
 		FeeLimit:       feeLimit,
-		NumRoutes:      int32(ctx.Int("num_max_routes")),
-		FinalCltvDelta: int32(ctx.Int("final_cltv_delta")),
 		Incoming:       ctx.Uint64("incoming"),
 		Outgoing:       ctx.Uint64("outgoing"),
 	}
