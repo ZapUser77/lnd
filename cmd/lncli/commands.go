@@ -2080,8 +2080,6 @@ func reBalance(ctx *cli.Context) error {
 		PubKey:         selfNode.IdentityPubkey,
 		Amt:            amt,
 		FeeLimit:       feeLimit,
-		NumRoutes:      int32(ctx.Int("num_max_routes")),
-		FinalCltvDelta: int32(ctx.Int("final_cltv_delta")),
 		Incoming:       ctx.Uint64("incoming"),
 		Outgoing:       ctx.Uint64("outgoing"),
 	}
@@ -2179,12 +2177,12 @@ func sendToRoute(ctx *cli.Context) error {
 	case ctx.IsSet("routes"):
 		jsonRoutes = ctx.String("routes")
 
-		// The user is specifying the routes as a positional argument.
+	// The user is specifying the routes as a positional argument.
 	case args.Present() && args.First() != "-":
 		jsonRoutes = args.First()
 
-		// The user is signalling that we should read stdin in order to parse
-		// the set of target routes.
+	// The user is signalling that we should read stdin in order to parse
+	// the set of target routes.
 	case args.Present() && args.First() == "-":
 		b, err := ioutil.ReadAll(os.Stdin)
 		if err != nil {
