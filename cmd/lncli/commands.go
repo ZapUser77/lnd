@@ -1991,14 +1991,6 @@ var reBalanceCommand = cli.Command{
 			Name:  "amt",
 			Usage: "number of satoshis you wish to balance",
 		},
-		cli.StringFlag{
-			Name:  "incoming",
-			Usage: "(optional) channel ID for incoming funds",
-		},
-		cli.StringFlag{
-			Name:  "outgoing",
-			Usage: "(optional) channel ID for outcgoing funds",
-		},
 		cli.Int64Flag{
 			Name: "fee_limit",
 			Usage: "maximum fee allowed in satoshis when sending " +
