@@ -2037,10 +2037,10 @@ func reBalance(ctx *cli.Context) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("Amount argument is missing.")
+		return fmt.Errorf("amount argument is missing")
 	}
 	if amt <= 0 {
-		return fmt.Errorf("Amount may not be negative nor zero.")
+		return fmt.Errorf("amount may not be negative nor zero")
 	}
 
 	feeLimit, err := retrieveFeeLimit(ctx)
@@ -2080,6 +2080,8 @@ func reBalance(ctx *cli.Context) error {
 		PubKey:         selfNode.IdentityPubkey,
 		Amt:            amt,
 		FeeLimit:       feeLimit,
+		NumRoutes:      int32(ctx.Int("num_max_routes")),
+		FinalCltvDelta: int32(ctx.Int("final_cltv_delta")),
 		Incoming:       ctx.Uint64("incoming"),
 		Outgoing:       ctx.Uint64("outgoing"),
 	}
